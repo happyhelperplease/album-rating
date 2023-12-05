@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Album Rating</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Album Rating</h1>
+
+    <form id="albumForm">
+        <label for="albumInput">Enter an album (type 'enough' to stop):</label>
+        <input type="text" id="albumInput">
+        <button type="button" onclick="addAlbum()">Add Album</button>
+    </form>
+
+    <div id="ratingsForm" style="display: none;">
+        <h2>Rate the albums:</h2>
+        <ol id="albumsList"></ol>
+        <button type="button" onclick="submitRatings()">Submit Ratings</button>
+    </div>
+
+    <div id="ranking" style="display: none;">
+        <h2>Ranking of albums based on criteria:</h2>
+        <ol id="rankedList"></ol>
+    </div>
+
+    <script>
+        let albums = [];
+
+        function addAlbum() {
+            const albumInput = document.getElementById('albumInput');
+            const album = albumInput.value.trim();
+
+            if (!album) return;
+
+            if (album.toLowerCase() === 'enough') {
+                document.getElementById('albumForm').style.display = 'none';
+                document.getElementById('ratingsForm').style.display = 'block';
+                displayAlbums();
+                return;
+            }
+
+            albums.push(album);
+            albumInput.value = '';
+            displayAlbums();
+        }
+
+        function displayAlbums() {
+            const albumsList = document.getElementById('albumsList');
+            albumsList.innerHTML = '';
+
+            albums.forEach((album, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${index + 1}. ${album}`;
+                albumsList.appendChild(li);
+            });
+        }
+
+        function submitRatings() {
+            const ratings = {};
+
+            albums.forEach(album => {
+                const lyrics = prompt(`Rate the lyrics for '${album}' from 1-10:`);
+                const melody = prompt(`Rate the melody for '${album}' from 1-10:`);
+                const specialMeaning = prompt(`Rate the special meaning for '${album}' from 1-10:`);
+                const uniqueness = prompt(`Rate the uniqueness for '${album}' from 1-10:`);
+
+                ratings[album] = {
+                    lyrics: parseInt(lyrics),
+                    melody: parseInt(melody),
+                    special_meaning: parseInt(specialMeaning),
+                    uniqueness: parseInt(uniqueness),
+                };
+            });
+
+            displayRanking(ratings);
+        }
+
+        function displayRanking(ratings) {
+            const rankedList = document.getElementById('rankedList');
+            rankedList.innerHTML = '';
+
+            const rankedAlbums = Object.entries(ratings)
+                .sort((a, b) => (
+                    Object.values(b[1]).reduce((sum, value) => sum + value, 0) -
+                    Object.values(a[1]).reduce((sum, value) => sum + value, 0)
+                ));
+
+            rankedAlbums.forEach((entry, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${index + 1}. ${entry[0]}`;
+                rankedList.appendChild(li);
+            });
+
+            document.getElementById('ranking').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
